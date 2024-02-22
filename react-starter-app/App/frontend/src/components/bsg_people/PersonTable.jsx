@@ -12,7 +12,6 @@ const PeopleTable = () => {
       const response = await axios.get(URL);
       setPeople(response.data);
     } catch (error) {
-      alert("Error fetching people from the server.");
       console.error("Error fetching people:", error);
     }
   };

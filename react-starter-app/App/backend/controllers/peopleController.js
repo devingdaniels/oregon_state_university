@@ -22,7 +22,7 @@ const getPersonByID = async (req, res) => {
   try {
     const personID = req.params.id;
     const query = "SELECT * FROM bsg_people WHERE id = ?";
-    const [result] = await db.query(query, [personID]);
+    const [result] = await db.pool.query(query, [personID]);
     // Check if person was found
     if (result.length === 0) {
       return res.status(404).json({ error: "Person not found" });
@@ -42,7 +42,7 @@ const createPerson = async (req, res) => {
     const query =
       "INSERT INTO bsg_people (fname, lname, homeworld, age) VALUES (?, ?, ?, ?)";
 
-    const response = await db.query(query, [
+    const response = await db.pool.query(query, [
       fname,
       lname,
       homeworld === "" ? null : parseInt(homeworld),
@@ -65,7 +65,7 @@ const updatePerson = async (req, res) => {
   const newPerson = req.body;
 
   try {
-    const [data] = await db.query("SELECT * FROM bsg_people WHERE id = ?", [
+    const [data] = await db.pool.query("SELECT * FROM bsg_people WHERE id = ?", [
       personID,
     ]);
 
@@ -83,7 +83,7 @@ const updatePerson = async (req, res) => {
         personID,
       ];
       // Perform the update
-      await db.query(query, values);
+      await db.pool.query(query, values);
       // Inform client of success and return 
       return res.json({ message: "Person updated successfully." });
     }
@@ -104,7 +104,7 @@ const deletePerson = async (req, res) => {
 
   try {
     // Ensure the person exitst
-    const [isExisting] = await db.query(
+    const [isExisting] = await db.pool.query(
       "SELECT 1 FROM bsg_people WHERE id = ?",
       [personID]
     );
@@ -114,7 +114,7 @@ const deletePerson = async (req, res) => {
     }
 
     // Delete related records from the intersection table (see FK contraints bsg_cert_people)
-    const [response] = await db.query(
+    const [response] = await db.pool.query(
       "DELETE FROM bsg_cert_people WHERE pid = ?",
       [personID]
     );
@@ -126,7 +126,7 @@ const deletePerson = async (req, res) => {
     );
 
     // Delete the person from bsg_people
-    await db.query("DELETE FROM bsg_people WHERE id = ?", [personID]);
+    await db.pool.query("DELETE FROM bsg_people WHERE id = ?", [personID]);
 
     // Return the appropriate status code
     res.status(204).json({ message: "Person deleted successfully" })

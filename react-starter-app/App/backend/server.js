@@ -3,19 +3,25 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const EXPRESS_PORT = process.env.EXPRESS_PORT || 3002;
+const IS_LOCAL = true // Change if you're on FLIP
 
 // Middleware:
 
-// If on FLIP, use cors() middleware to allow cross-origin requests from the frontend with your port number:
-app.use(cors({ credentials: true, origin: "http://flip2.engr.oregonstate.edu:3500" }));
-app.use(cors());
+// Enable CORS for all requests
+// (This is a sample app, so we'll enable CORS for all origins, but normally you should restrict it to specific origins)
+app.use(cors({ credentials: true, origin: "*" }));
+
+// Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
 // Routes:
 app.use("/api/people", require("./routes/peopleRoutes"));
 
-app.listen(PORT, () => {
-  // Change to whatever FLIP server you're on, copy and paste URL into browser to test:
-  console.log(`Server running:  http://flip2.engr.oregonstate.edu:${PORT}...`);
+app.listen(EXPRESS_PORT, () => {
+  if (IS_LOCAL)
+    console.log(`Express server running: http://localhost:${EXPRESS_PORT}/`);
+  else
+    console.log(`Express server running: http://flipX.engr.oregonstate.edu:${EXPRESS_PORT}/`);
 });
+
